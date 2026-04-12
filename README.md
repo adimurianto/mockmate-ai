@@ -33,7 +33,7 @@ It generates questions, example answers, feedback, and final review based on you
 ## ⚙️ Setup
 
 ```bash
-git clone https://github.com/yourusername/mockmate-ai.git
+git clone https://github.com/adimurianto/mockmate-ai.git
 cd mockmate-ai
 npm install
 ```
