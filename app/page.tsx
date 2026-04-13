@@ -27,6 +27,16 @@ export default function Home() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [loadingFinal, setLoadingFinal] = useState(false);
 
+  const [translatedQuestion, setTranslatedQuestion] = useState("");
+  const [translatedAnswer, setTranslatedAnswer] = useState("");
+  const [translatedUserAnswer, setTranslatedUserAnswer] = useState("");
+
+  const [loadingTranslateQ, setLoadingTranslateQ] = useState(false);
+  const [loadingTranslateA, setLoadingTranslateA] = useState(false);
+  const [loadingTranslateUser, setLoadingTranslateUser] = useState(false);
+
+  const [cacheTranslate, setCacheTranslate] = useState<Record<string, string>>({});
+
   useEffect(() => {
     setCV(localStorage.getItem("cv") || "");
     setRole(localStorage.getItem("role") || "");
@@ -39,6 +49,57 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("role", role);
   }, [role]);
+
+  // =========================
+  // TRANSLATE TEXT
+  // =========================
+  const translateText = async (text: string) => {
+    if (!text) return "";
+
+    if (cacheTranslate[text]) return cacheTranslate[text];
+
+    try {
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+          text
+        )}&langpair=en|id`
+      );
+
+      const data = await res.json();
+      const result = data.responseData.translatedText || "";
+
+      setCacheTranslate((prev) => ({
+        ...prev,
+        [text]: result,
+      }));
+
+      return result;
+    } catch (err) {
+      console.error(err);
+      return "Translation failed";
+    }
+  };
+
+  const handleTranslateQuestion = async () => {
+    setLoadingTranslateQ(true);
+    const res = await translateText(questions[index]);
+    setTranslatedQuestion(res);
+    setLoadingTranslateQ(false);
+  };
+
+  const handleTranslateAnswer = async () => {
+    setLoadingTranslateA(true);
+    const res = await translateText(answers[index]);
+    setTranslatedAnswer(res);
+    setLoadingTranslateA(false);
+  };
+
+  const handleTranslateUserAnswer = async () => {
+    setLoadingTranslateUser(true);
+    const res = await translateText(userAnswer);
+    setTranslatedUserAnswer(res);
+    setLoadingTranslateUser(false);
+  };
 
   // =========================
   // GROQ CALL
@@ -179,6 +240,10 @@ export default function Home() {
       setIndex(index + 1);
       setUserAnswer("");
       setFeedback("");
+
+      setTranslatedQuestion("");
+      setTranslatedAnswer("");
+      setTranslatedUserAnswer("");
     }
   };
 
@@ -190,6 +255,10 @@ export default function Home() {
       setIndex(index - 1);
       setUserAnswer("");
       setFeedback("");
+
+      setTranslatedQuestion("");
+      setTranslatedAnswer("");
+      setTranslatedUserAnswer("");
     }
   };
 
@@ -328,6 +397,18 @@ export default function Home() {
             >
               🔊
             </button>
+
+            <button
+              onClick={handleTranslateQuestion}
+              className="ml-2 text-green-400 hover:text-green-300"
+            >
+              {loadingTranslateQ ? "..." : "🌐"}
+            </button>
+            {translatedQuestion && (
+              <p className="text-green-300 mt-2 text-sm">
+                {translatedQuestion}
+              </p>
+            )}
           </div>
         )}
 
@@ -353,6 +434,18 @@ export default function Home() {
             >
               🔊
             </button>
+
+            <button
+              onClick={handleTranslateAnswer}
+              className="ml-2 text-green-400 hover:text-green-300"
+            >
+              {loadingTranslateA ? "..." : "🌐"}
+            </button>
+            {translatedAnswer && (
+              <p className="text-green-300 mt-2 text-sm">
+                {translatedAnswer}
+              </p>
+            )}
           </div>
         )}
 
@@ -372,6 +465,18 @@ export default function Home() {
             >
               🔊
             </button>
+
+            <button
+              onClick={handleTranslateUserAnswer}
+              className="ml-2 text-green-400 hover:text-green-300"
+            >
+              {loadingTranslateUser ? "..." : "🌐"}
+            </button>
+            {translatedUserAnswer && (
+              <p className="text-green-300 mt-2 text-sm">
+                {translatedUserAnswer}
+              </p>
+            )}
           </div>
         )}
 
