@@ -18,6 +18,7 @@ export default function Home() {
     role, setRole,
     stage, setStage,
     format, setFormat,
+    questionCount, setQuestionCount,
     questions,
     answers,
     index,
@@ -114,9 +115,6 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-400 via-white to-purple-400 bg-clip-text text-transparent">
               MockMate AI
             </h1>
-            <p className="text-zinc-500 text-sm max-w-md mx-auto">
-              Master your next interview with personalized AI feedback and Singaporean HR insights.
-            </p>
           </div>
         </header>
 
@@ -126,8 +124,7 @@ export default function Home() {
             <Card className="h-fit">
               <CardHeader>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">📝</span>
-                  Profile Setup
+                Profile Setup
                 </h2>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -225,6 +222,14 @@ export default function Home() {
                     ]}
                   />
                 </div>
+                <Input
+                  label="Number of Questions"
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={questionCount}
+                  onChange={(e) => setQuestionCount(Number(e.target.value))}
+                />
               </CardContent>
               <CardFooter>
                 <Button

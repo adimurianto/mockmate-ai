@@ -6,6 +6,7 @@ export const useInterview = () => {
   const [role, setRole] = useState("");
   const [stage, setStage] = useState("HR Interview");
   const [format, setFormat] = useState("Singapore");
+  const [questionCount, setQuestionCount] = useState(10);
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [index, setIndex] = useState(0);
@@ -24,6 +25,7 @@ export const useInterview = () => {
     setRole(localStorage.getItem("role") || "");
     setStage(localStorage.getItem("stage") || "HR Interview");
     setFormat(localStorage.getItem("format") || "Singapore");
+    setQuestionCount(Number(localStorage.getItem("questionCount")) || 10);
   }, []);
 
   useEffect(() => {
@@ -42,6 +44,10 @@ export const useInterview = () => {
     localStorage.setItem("format", format);
   }, [format]);
 
+  useEffect(() => {
+    localStorage.setItem("questionCount", questionCount.toString());
+  }, [questionCount]);
+
   const generateInterview = async () => {
     if (!cv || !role) throw new Error("Please fill CV & Role");
 
@@ -54,12 +60,12 @@ export const useInterview = () => {
 Candidate: Indonesian with basic English.
 Generate interview data in JSON ONLY:
 {
-  "questions": string[10],
-  "answers": string[10]
+  "questions": string[${questionCount}],
+  "answers": string[${questionCount}]
 }
 RULES:
-- 10 questions exactly
-- 10 answers exactly (match question index)
+- ${questionCount} questions exactly
+- ${questionCount} answers exactly (match question index)
 - Simple English
 - 2–3 sentences per answer
 - Based on CV + role + interview stage + ${format} culture/standard
@@ -157,6 +163,7 @@ RULES:
     role, setRole,
     stage, setStage,
     format, setFormat,
+    questionCount, setQuestionCount,
     questions,
     answers,
     index,
