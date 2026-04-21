@@ -5,15 +5,18 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/Card";
 import { Input, TextArea } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Badge, IconButton } from "@/components/ui/Badge";
 import { useInterview } from "@/hooks/useInterview";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTTS } from "@/hooks/useTTS";
+import { extractTextFromPDF } from "@/lib/pdf";
 
 export default function Home() {
   const {
     cv, setCV,
     role, setRole,
+    stage, setStage,
     questions,
     answers,
     index,
@@ -34,6 +37,35 @@ export default function Home() {
   const [showExample, setShowExample] = useState(false);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [activeTranslating, setActiveTranslating] = useState<string | null>(null);
+  const [cvMode, setCvMode] = useState<'manual' | 'upload'>('manual');
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validation
+    if (file.type !== "application/pdf") {
+      alert("Please upload a PDF file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File is too large. Max 5MB allowed.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const text = await extractTextFromPDF(file);
+      setCV(text);
+      setCvMode('manual'); // Switch to manual to show the extracted text
+    } catch (err: any) {
+      alert("Failed to parse PDF: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleTranslate = async (text: string, id: string) => {
     setActiveTranslating(id);
@@ -98,18 +130,87 @@ export default function Home() {
                 </h2>
               </CardHeader>
               <CardContent className="space-y-4">
-                <TextArea
-                  label="Curriculum Vitae"
-                  placeholder="Paste your CV content here..."
-                  rows={8}
-                  value={cv}
-                  onChange={(e) => setCV(e.target.value)}
-                />
+                <div className="flex p-1 bg-zinc-900 rounded-xl border border-zinc-800">
+                  <button
+                    onClick={() => setCvMode('manual')}
+                    className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${
+                      cvMode === 'manual' 
+                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
+                        : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
+                  >
+                    Manual Text
+                  </button>
+                  <button
+                    onClick={() => setCvMode('upload')}
+                    className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${
+                      cvMode === 'upload' 
+                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
+                        : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
+                  >
+                    Upload PDF
+                  </button>
+                </div>
+
+                {cvMode === 'manual' ? (
+                  <TextArea
+                    label="Curriculum Vitae"
+                    placeholder="Paste your CV content here..."
+                    rows={8}
+                    value={cv}
+                    onChange={(e) => setCV(e.target.value)}
+                  />
+                ) : (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-zinc-400 ml-1">Upload CV (PDF)</label>
+                    <div className="relative group">
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        disabled={isUploading}
+                      />
+                      <div className={`p-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 transition-all ${
+                        isUploading 
+                          ? 'bg-blue-500/5 border-blue-500/30' 
+                          : 'bg-zinc-800/30 border-zinc-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/5'
+                      }`}>
+                        {isUploading ? (
+                          <>
+                            <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                            <span className="text-xs text-blue-400 font-medium">Extracting text...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-2xl">📄</span>
+                            <div className="text-center">
+                              <p className="text-xs font-medium text-zinc-300">Click or drag PDF to upload</p>
+                              <p className="text-[10px] text-zinc-500 mt-1">PDF files only, max 5MB</p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <Input
                   label="Target Role"
                   placeholder="e.g. Senior Frontend Engineer"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
+                />
+                <Select
+                  label="Interview Stage"
+                  value={stage}
+                  onChange={(e) => setStage(e.target.value)}
+                  options={[
+                    { label: "HR Interview (Human Resources)", value: "HR Interview" },
+                    { label: "User Interview (Hiring Manager / Tech Lead)", value: "User Interview" },
+                    { label: "Final Interview (Manager / Director / CEO)", value: "Final Interview" },
+                    { label: "Offering / Negotiation", value: "Offering / Negotiation" },
+                  ]}
                 />
               </CardContent>
               <CardFooter>

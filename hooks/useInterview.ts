@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 export const useInterview = () => {
   const [cv, setCV] = useState("");
   const [role, setRole] = useState("");
+  const [stage, setStage] = useState("HR Interview");
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [index, setIndex] = useState(0);
@@ -20,6 +21,7 @@ export const useInterview = () => {
   useEffect(() => {
     setCV(localStorage.getItem("cv") || "");
     setRole(localStorage.getItem("role") || "");
+    setStage(localStorage.getItem("stage") || "HR Interview");
   }, []);
 
   useEffect(() => {
@@ -29,6 +31,10 @@ export const useInterview = () => {
   useEffect(() => {
     localStorage.setItem("role", role);
   }, [role]);
+
+  useEffect(() => {
+    localStorage.setItem("stage", stage);
+  }, [stage]);
 
   const generateInterview = async () => {
     if (!cv || !role) throw new Error("Please fill CV & Role");
@@ -50,13 +56,13 @@ RULES:
 - 10 answers exactly (match question index)
 - Simple English
 - 2–3 sentences per answer
-- Based on CV + role
+- Based on CV + role + interview stage
 - No explanation
 - No markdown`
         },
         {
           role: "user",
-          content: `CV: ${cv}\nRole: ${role}`
+          content: `CV: ${cv}\nRole: ${role}\nStage: ${stage}`
         }
       ]);
 
@@ -112,7 +118,7 @@ RULES:
         },
         {
           role: "user",
-          content: JSON.stringify({ cv, role, questions, answers })
+          content: JSON.stringify({ cv, role, stage, questions, answers })
         }
       ]);
       setFinalReview(text);
@@ -143,6 +149,7 @@ RULES:
   return {
     cv, setCV,
     role, setRole,
+    stage, setStage,
     questions,
     answers,
     index,
