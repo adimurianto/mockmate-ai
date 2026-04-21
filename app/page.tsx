@@ -17,6 +17,7 @@ export default function Home() {
     cv, setCV,
     role, setRole,
     stage, setStage,
+    format, setFormat,
     questions,
     answers,
     index,
@@ -212,6 +213,16 @@ export default function Home() {
                     { label: "Offering / Negotiation", value: "Offering / Negotiation" },
                   ]}
                 />
+                <Select
+                  label="Interview Standard/Culture"
+                  value={format}
+                  onChange={(e) => setFormat(e.target.value)}
+                  options={[
+                    { label: "Singapore (SG-Style)", value: "Singapore" },
+                    { label: "Malaysia (MY-Style)", value: "Malaysia" },
+                    { label: "Global Standard (International)", value: "Global" },
+                  ]}
+                />
               </CardContent>
               <CardFooter>
                 <Button
@@ -232,7 +243,7 @@ export default function Home() {
               </div>
               <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 flex flex-col gap-1">
                 <span className="text-zinc-500 text-[10px] uppercase tracking-wider font-bold">Format</span>
-                <span className="text-xl font-mono text-purple-400">SG-Style</span>
+                <span className="text-xl font-mono text-purple-400">{format === 'Singapore' ? 'SG-Style' : format === 'Malaysia' ? 'MY-Style' : 'Global'}</span>
               </div>
             </div>
           </section>

@@ -5,6 +5,7 @@ export const useInterview = () => {
   const [cv, setCV] = useState("");
   const [role, setRole] = useState("");
   const [stage, setStage] = useState("HR Interview");
+  const [format, setFormat] = useState("Singapore");
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [index, setIndex] = useState(0);
@@ -22,6 +23,7 @@ export const useInterview = () => {
     setCV(localStorage.getItem("cv") || "");
     setRole(localStorage.getItem("role") || "");
     setStage(localStorage.getItem("stage") || "HR Interview");
+    setFormat(localStorage.getItem("format") || "Singapore");
   }, []);
 
   useEffect(() => {
@@ -36,6 +38,10 @@ export const useInterview = () => {
     localStorage.setItem("stage", stage);
   }, [stage]);
 
+  useEffect(() => {
+    localStorage.setItem("format", format);
+  }, [format]);
+
   const generateInterview = async () => {
     if (!cv || !role) throw new Error("Please fill CV & Role");
 
@@ -44,7 +50,7 @@ export const useInterview = () => {
       const text = await api.callAI([
         {
           role: "system",
-          content: `You are a professional HR + Technical interviewer from Singapore.
+          content: `You are a professional HR + Technical interviewer from ${format}.
 Candidate: Indonesian with basic English.
 Generate interview data in JSON ONLY:
 {
@@ -56,13 +62,13 @@ RULES:
 - 10 answers exactly (match question index)
 - Simple English
 - 2–3 sentences per answer
-- Based on CV + role + interview stage
+- Based on CV + role + interview stage + ${format} culture/standard
 - No explanation
 - No markdown`
         },
         {
           role: "user",
-          content: `CV: ${cv}\nRole: ${role}\nStage: ${stage}`
+          content: `CV: ${cv}\nRole: ${role}\nStage: ${stage}\nFormat: ${format}`
         }
       ]);
 
@@ -89,7 +95,7 @@ RULES:
       const text = await api.callAI([
         {
           role: "system",
-          content: `You are a strict but fair Singapore HR interviewer. Compare user answer with expected answer. 
+          content: `You are a strict but fair ${format} HR interviewer. Compare user answer with expected answer. 
           Give: Score (1-10), What is good, What is missing, Improvement tip. Simple English. Short feedback.`
         },
         {
@@ -112,7 +118,7 @@ RULES:
       const text = await api.callAI([
         {
           role: "system",
-          content: `You are a senior HR interviewer from Singapore tech company. Give FINAL FEEDBACK.
+          content: `You are a senior HR interviewer from ${format} tech company. Give FINAL FEEDBACK.
           Focus on suggestions. Use SIMPLE English + Indonesian. Structure clearly with bullet points.
           FORMAT: ENGLISH: (points) INDONESIA: (points)`
         },
@@ -150,6 +156,7 @@ RULES:
     cv, setCV,
     role, setRole,
     stage, setStage,
+    format, setFormat,
     questions,
     answers,
     index,
