@@ -96,7 +96,7 @@ export default function Home() {
         <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-purple-600/10 blur-[120px] rounded-full" />
       </div>
 
-      <div className="w-full max-w-4xl space-y-8 relative z-10">
+      <div className="w-full max-w-6xl space-y-12 relative z-10">
         {/* Header */}
         <header className="flex flex-col items-center text-center space-y-4">
           <div className="relative group">
@@ -120,9 +120,9 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Configuration Section */}
-          <section className="lg:col-span-5 space-y-6">
+          <section className="lg:col-span-4 space-y-8">
             <Card className="h-fit">
               <CardHeader>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -202,27 +202,29 @@ export default function Home() {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 />
-                <Select
-                  label="Interview Stage"
-                  value={stage}
-                  onChange={(e) => setStage(e.target.value)}
-                  options={[
-                    { label: "HR Interview (Human Resources)", value: "HR Interview" },
-                    { label: "User Interview (Hiring Manager / Tech Lead)", value: "User Interview" },
-                    { label: "Final Interview (Manager / Director / CEO)", value: "Final Interview" },
-                    { label: "Offering / Negotiation", value: "Offering / Negotiation" },
-                  ]}
-                />
-                <Select
-                  label="Interview Standard/Culture"
-                  value={format}
-                  onChange={(e) => setFormat(e.target.value)}
-                  options={[
-                    { label: "Singapore (SG-Style)", value: "Singapore" },
-                    { label: "Malaysia (MY-Style)", value: "Malaysia" },
-                    { label: "Global Standard (International)", value: "Global" },
-                  ]}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select
+                    label="Interview Stage"
+                    value={stage}
+                    onChange={(e) => setStage(e.target.value)}
+                    options={[
+                      { label: "HR Interview", value: "HR Interview" },
+                      { label: "User Interview", value: "User Interview" },
+                      { label: "Final Interview", value: "Final Interview" },
+                      { label: "Offering/Negotiation", value: "Offering / Negotiation" },
+                    ]}
+                  />
+                  <Select
+                    label="Standard/Culture"
+                    value={format}
+                    onChange={(e) => setFormat(e.target.value)}
+                    options={[
+                      { label: "Singapore", value: "Singapore" },
+                      { label: "Malaysia", value: "Malaysia" },
+                      { label: "Global", value: "Global" },
+                    ]}
+                  />
+                </div>
               </CardContent>
               <CardFooter>
                 <Button
@@ -249,7 +251,7 @@ export default function Home() {
           </section>
 
           {/* Interview Section */}
-          <section className="lg:col-span-7 space-y-6">
+          <section className="lg:col-span-8 space-y-8">
             {questions.length > 0 ? (
               <>
                 {/* Question Card */}
